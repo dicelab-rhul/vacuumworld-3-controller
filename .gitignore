@@ -1,0 +1,10 @@
+bin/
+bin/*
+bin/**
+logs/
+.directory
+*.jar
+*.class
+target/
+target/*
+target/**
