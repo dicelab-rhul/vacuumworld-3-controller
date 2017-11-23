@@ -8,3 +8,4 @@ logs/
 target/
 target/*
 target/**
+org.sonarlint.eclipse.core.prefs
