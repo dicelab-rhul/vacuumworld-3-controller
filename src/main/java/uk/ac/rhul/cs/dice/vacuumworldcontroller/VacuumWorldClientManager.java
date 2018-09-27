@@ -15,6 +15,7 @@ import uk.ac.rhul.cs.dice.vacuumworld.vwcommon.VacuumWorldMessage;
 public class VacuumWorldClientManager implements Runnable {
     private Process modelProcess;
     private Socket modelSocket;
+    private String modelIp;
     private int modelPort;
     private InputStream fromModel;
     private InputStream errorsFromModel;
@@ -30,27 +31,32 @@ public class VacuumWorldClientManager implements Runnable {
     private VacuumWorldMessage latestFromView;
     private VacuumWorldMessage latestFromModel;
     
-    public VacuumWorldClientManager(Socket clientSocket, int modelPort) throws IOException {
+    public VacuumWorldClientManager(Socket clientSocket, String modelIp, int modelPort) throws IOException {
 	this.viewSocket = clientSocket;
 	this.fromView = this.viewSocket.getInputStream();
 	this.toView = this.viewSocket.getOutputStream();
 	this.fromViewObjectStream = new ObjectInputStream(this.fromView);
 	this.toViewObjectStream = new ObjectOutputStream(this.toView);
 	
+	this.modelIp = modelIp;
 	this.modelPort = modelPort;
 	//createNewModelInstance();
 	connectToModel();
     }
 
     private void connectToModel() throws IOException {
-	this.modelSocket = new Socket("127.0.0.1", this.modelPort);
+	LogUtils.log("Controller here: attepting to connect to the model at " + this.modelIp + ":" + this.modelPort + "...");
+	
+	this.modelSocket = new Socket(this.modelIp, this.modelPort);
 	this.toModel = this.modelSocket.getOutputStream();
 	this.fromModel = this.modelSocket.getInputStream();
 	this.fromModelObjectStream = new ObjectInputStream(this.fromModel);
 	this.toModelObjectStream = new ObjectOutputStream(this.toModel);
+	
+	LogUtils.log("Controller here: connected to the model at " + this.modelIp + ":" + this.modelPort + ".");
     }
 
-    private void createNewModelInstance() throws IOException {
+    /*private void createNewModelInstance() throws IOException {
 	this.modelProcess = createModelProcess();
 	this.fromModel = this.modelProcess.getInputStream();
 	this.errorsFromModel = this.modelProcess.getErrorStream();
@@ -61,7 +67,7 @@ public class VacuumWorldClientManager implements Runnable {
 
     private Process createModelProcess() throws IOException {
 	return Runtime.getRuntime().exec(new String[] {"java", "-jar", "vw3.jar"});
-    }
+    }*/
     
     public boolean hasToStop() {
 	return this.stop;
@@ -117,7 +123,7 @@ public class VacuumWorldClientManager implements Runnable {
 
     @Override
     public void run() {
-	LogUtils.log("Controller here: thread running! Currently managing view.");
+	LogUtils.log("Controller here: thread running! Currently managing a GUI.");
 	
 	doHandshake();
 	
@@ -127,18 +133,23 @@ public class VacuumWorldClientManager implements Runnable {
     }
 
     private void doHandshake() {
+	LogUtils.log("Controller here: waiting for the first handshake message from the GUI...");
+	
 	receiveHVC();
 	receiveHMC();
 	receiveHVM();
 	receiveHMV();
 	
-	LogUtils.log("Controller here: handshake completed!");
+	LogUtils.log("Controller here: handshakes completed!");
     }
 
     private void receiveHVC() {
 	try {
 	    this.latestFromView = (VacuumWorldMessage) this.fromViewObjectStream.readObject();
 	    parseHVC();
+	    
+	    LogUtils.log("Controller here: initiating handshake with the model...");
+	    
 	    sendHCM();
 	}
 	catch(Exception e) {
@@ -147,7 +158,7 @@ public class VacuumWorldClientManager implements Runnable {
     }
 
     private void sendHCM() throws IOException {
-	sendTo(this.toModelObjectStream, new VacuumWorldMessage(VWMessageCodes.HELLO_MODEL_FROM_CONTROLLER, null));
+	sendTo(this.toModelObjectStream, new VacuumWorldMessage(VWMessageCodes.HELLO_MODEL_FROM_CONTROLLER, null), "model");
     }
 
     private void receiveHMC() {
@@ -162,7 +173,7 @@ public class VacuumWorldClientManager implements Runnable {
     }
 
     private void sendHCV() throws IOException {
-	sendTo(this.toViewObjectStream, new VacuumWorldMessage(VWMessageCodes.HELLO_VIEW_FROM_CONTROLLER, null));
+	sendTo(this.toViewObjectStream, new VacuumWorldMessage(VWMessageCodes.HELLO_VIEW_FROM_CONTROLLER, null), "view");
     }
 
     private void receiveHVM() {
@@ -177,7 +188,7 @@ public class VacuumWorldClientManager implements Runnable {
     }
 
     private void sendHVM() throws IOException {
-	sendTo(this.toModelObjectStream, this.latestFromView);
+	sendTo(this.toModelObjectStream, this.latestFromView, "model");
     }
 
     private void receiveHMV() {
@@ -192,44 +203,55 @@ public class VacuumWorldClientManager implements Runnable {
     }
 
     private void sendHMV() throws IOException {
-	sendTo(this.toViewObjectStream, this.latestFromModel);
+	sendTo(this.toViewObjectStream, this.latestFromModel, "view");
     }
     
-    private void sendTo(ObjectOutputStream to, VacuumWorldMessage message) throws IOException {
+    private void sendTo(ObjectOutputStream to, VacuumWorldMessage message, String recipient) throws IOException {
+	LogUtils.log("Controller here: sending " + message.getCode() + " to the " + recipient + "...");
+	
 	to.reset();
 	to.writeObject(message);
 	to.flush();
     }
 
     private void cycle() {
-	// TODO Auto-generated method stub
+	//TODO write the real logic.
+	
+	try {
+	    LogUtils.log("Controller here: I am idle...");
+		
+	    Thread.sleep(5000);
+	}
+	catch(InterruptedException e) {
+	    Thread.currentThread().interrupt();
+	}
     }
     
     private void parseHVC() {
-	parseMessageType(VWMessageCodes.HELLO_CONTROLLER_FROM_VIEW, this.latestFromView);
+	parseMessageType(VWMessageCodes.HELLO_CONTROLLER_FROM_VIEW, this.latestFromView, "view");
     }
 
     private void parseHMC() {
-	parseMessageType(VWMessageCodes.HELLO_CONTROLLER_FROM_MODEL, this.latestFromModel);
+	parseMessageType(VWMessageCodes.HELLO_CONTROLLER_FROM_MODEL, this.latestFromModel, "model");
     }
     
     private void parseHVM() {
-	parseMessageType(VWMessageCodes.HELLO_MODEL_FROM_VIEW, this.latestFromView);
+	parseMessageType(VWMessageCodes.HELLO_MODEL_FROM_VIEW, this.latestFromView, "view");
     }
 
     private void parseHMV() {
-	parseMessageType(VWMessageCodes.HELLO_VIEW_FROM_MODEL, this.latestFromModel);
+	parseMessageType(VWMessageCodes.HELLO_VIEW_FROM_MODEL, this.latestFromModel, "model");
     }
     
     
-    private void parseMessageType(VWMessageCodes expected, VacuumWorldMessage message) {
+    private void parseMessageType(VWMessageCodes expected, VacuumWorldMessage message, String sender) {
 	VWMessageCodes receivedCode = message.getCode();
 	
 	if(!expected.equals(receivedCode)) {
 	    throw new IllegalArgumentException("Expected" + expected + ", got " + receivedCode + " instead.");
 	}
 	else {
-	    LogUtils.log("Controller here: received " + receivedCode);
+	    LogUtils.log("Controller here: received " + receivedCode + " from the " + sender);
 	}
     }
 }
