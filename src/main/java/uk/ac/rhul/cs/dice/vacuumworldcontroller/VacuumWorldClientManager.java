@@ -15,6 +15,7 @@ import uk.ac.rhul.cs.dice.vacuumworld.vwcommon.VacuumWorldMessage;
 public class VacuumWorldClientManager implements Runnable {
     private Process modelProcess;
     private Socket modelSocket;
+    private int modelPort;
     private InputStream fromModel;
     private InputStream errorsFromModel;
     private OutputStream toModel;
@@ -29,19 +30,20 @@ public class VacuumWorldClientManager implements Runnable {
     private VacuumWorldMessage latestFromView;
     private VacuumWorldMessage latestFromModel;
     
-    public VacuumWorldClientManager(Socket clientSocket) throws IOException {
+    public VacuumWorldClientManager(Socket clientSocket, int modelPort) throws IOException {
 	this.viewSocket = clientSocket;
 	this.fromView = this.viewSocket.getInputStream();
 	this.toView = this.viewSocket.getOutputStream();
 	this.fromViewObjectStream = new ObjectInputStream(this.fromView);
 	this.toViewObjectStream = new ObjectOutputStream(this.toView);
 	
+	this.modelPort = modelPort;
 	//createNewModelInstance();
 	connectToModel();
     }
 
     private void connectToModel() throws IOException {
-	this.modelSocket = new Socket("127.0.0.1", 17777);
+	this.modelSocket = new Socket("127.0.0.1", this.modelPort);
 	this.toModel = this.modelSocket.getOutputStream();
 	this.fromModel = this.modelSocket.getInputStream();
 	this.fromModelObjectStream = new ObjectInputStream(this.fromModel);
@@ -115,6 +117,8 @@ public class VacuumWorldClientManager implements Runnable {
 
     @Override
     public void run() {
+	LogUtils.log("Controller here: thread running! Currently managing view.");
+	
 	doHandshake();
 	
 	while(!this.stop) {
