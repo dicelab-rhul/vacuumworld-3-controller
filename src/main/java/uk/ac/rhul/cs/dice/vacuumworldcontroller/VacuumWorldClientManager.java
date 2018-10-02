@@ -215,8 +215,15 @@ public class VacuumWorldClientManager implements Runnable {
     }
 
     private void cycle() {
-	//TODO write the real logic.
+	try {
+	    waitForView();
+	    waitForModel();
+	}
+	catch(Exception e) {
+	    LogUtils.log(e);
+	}
 	
+	/*
 	try {
 	    LogUtils.log("Controller here: I am idle...");
 		
@@ -224,9 +231,37 @@ public class VacuumWorldClientManager implements Runnable {
 	}
 	catch(InterruptedException e) {
 	    Thread.currentThread().interrupt();
-	}
+	}*/
     }
     
+    private void waitForView() throws IOException {
+	try {
+	    LogUtils.log("Controller here: waiting for view...");
+	    
+	    VacuumWorldMessage message = (VacuumWorldMessage) this.fromViewObjectStream.readObject();
+	    this.toModelObjectStream.reset();
+	    this.toModelObjectStream.writeObject(message);
+	    this.toModelObjectStream.flush();
+	}
+	catch(Exception e) {
+	    throw new IOException(e);
+	}
+    }
+
+    private void waitForModel() throws IOException {
+	try {
+	    LogUtils.log("Controller here: waiting for model...");
+	    
+	    VacuumWorldMessage message = (VacuumWorldMessage) this.fromModelObjectStream.readObject();
+	    this.toViewObjectStream.reset();
+	    this.toViewObjectStream.writeObject(message);
+	    this.toViewObjectStream.flush();
+	}
+	catch(Exception e) {
+	    throw new IOException(e);
+	}
+    }
+
     private void parseHVC() {
 	parseMessageType(VWMessageCodes.HELLO_CONTROLLER_FROM_VIEW, this.latestFromView, "view");
     }
