@@ -239,13 +239,20 @@ public class VacuumWorldClientManager implements Runnable {
 	    LogUtils.log("Controller here: waiting for view...");
 	    
 	    VacuumWorldMessage message = (VacuumWorldMessage) this.fromViewObjectStream.readObject();
+	    
 	    this.toModelObjectStream.reset();
 	    this.toModelObjectStream.writeObject(message);
 	    this.toModelObjectStream.flush();
 	}
 	catch(Exception e) {
-	    throw new IOException(e);
+	    shutdown(e);
 	}
+    }
+
+    private void shutdown(Exception e) {
+	LogUtils.fakeLog(e);
+	
+	System.exit(0);
     }
 
     private void waitForModel() throws IOException {
@@ -253,12 +260,15 @@ public class VacuumWorldClientManager implements Runnable {
 	    LogUtils.log("Controller here: waiting for model...");
 	    
 	    VacuumWorldMessage message = (VacuumWorldMessage) this.fromModelObjectStream.readObject();
+	    
+	    LogUtils.log(message.getContent().toString());
+	    
 	    this.toViewObjectStream.reset();
 	    this.toViewObjectStream.writeObject(message);
 	    this.toViewObjectStream.flush();
 	}
 	catch(Exception e) {
-	    throw new IOException(e);
+	    shutdown(e);
 	}
     }
 
