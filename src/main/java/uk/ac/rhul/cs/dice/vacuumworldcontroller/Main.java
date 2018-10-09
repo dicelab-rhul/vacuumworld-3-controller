@@ -21,8 +21,6 @@ public class Main {
 	
 	if (!checkPorts(ports[0], ports[1])) {
 	    LogUtils.log("Malformed or illegal details have been provided. Please edit " + CONFIG_FILE_PATH + " and retry.");
-	    
-	    return;
 	}
 	else {
 	    VacuumWorldController controller = new VacuumWorldController(Integer.valueOf(ports[0]), HOST, Integer.valueOf(ports[1]));
@@ -59,11 +57,7 @@ public class Main {
 	    return false;
 	}
 
-	if (!testPort(environmentPort)) {
-	    return false;
-	}
-
-	return true;
+	return testPort(environmentPort);
     }
 
     private static boolean testPort(String portRepresentation) {

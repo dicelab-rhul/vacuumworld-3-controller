@@ -30,6 +30,8 @@ public class VacuumWorldClientManager implements Runnable {
     private volatile boolean stop;
     private VacuumWorldMessage latestFromView;
     private VacuumWorldMessage latestFromModel;
+    private static final String MODEL = "model";
+    private static final String VIEW = "view";
     
     public VacuumWorldClientManager(Socket clientSocket, String modelIp, int modelPort) throws IOException {
 	this.viewSocket = clientSocket;
@@ -40,7 +42,7 @@ public class VacuumWorldClientManager implements Runnable {
 	
 	this.modelIp = modelIp;
 	this.modelPort = modelPort;
-	//createNewModelInstance();
+
 	connectToModel();
     }
 
@@ -55,19 +57,6 @@ public class VacuumWorldClientManager implements Runnable {
 	
 	LogUtils.log("Controller here: connected to the model at " + this.modelIp + ":" + this.modelPort + ".");
     }
-
-    /*private void createNewModelInstance() throws IOException {
-	this.modelProcess = createModelProcess();
-	this.fromModel = this.modelProcess.getInputStream();
-	this.errorsFromModel = this.modelProcess.getErrorStream();
-	this.toModel = this.modelProcess.getOutputStream();
-	this.fromModelObjectStream = new ObjectInputStream(this.fromModel);
-	this.toModelObjectStream = new ObjectOutputStream(this.toModel);
-    }
-
-    private Process createModelProcess() throws IOException {
-	return Runtime.getRuntime().exec(new String[] {"java", "-jar", "vw3.jar"});
-    }*/
     
     public boolean hasToStop() {
 	return this.stop;
@@ -158,7 +147,7 @@ public class VacuumWorldClientManager implements Runnable {
     }
 
     private void sendHCM() throws IOException {
-	sendTo(this.toModelObjectStream, new VacuumWorldMessage(VWMessageCodes.HELLO_MODEL_FROM_CONTROLLER, null), "model");
+	sendTo(this.toModelObjectStream, new VacuumWorldMessage(VWMessageCodes.HELLO_MODEL_FROM_CONTROLLER, null), VacuumWorldClientManager.MODEL);
     }
 
     private void receiveHMC() {
@@ -173,7 +162,7 @@ public class VacuumWorldClientManager implements Runnable {
     }
 
     private void sendHCV() throws IOException {
-	sendTo(this.toViewObjectStream, new VacuumWorldMessage(VWMessageCodes.HELLO_VIEW_FROM_CONTROLLER, null), "view");
+	sendTo(this.toViewObjectStream, new VacuumWorldMessage(VWMessageCodes.HELLO_VIEW_FROM_CONTROLLER, null), VacuumWorldClientManager.VIEW);
     }
 
     private void receiveHVM() {
@@ -188,7 +177,7 @@ public class VacuumWorldClientManager implements Runnable {
     }
 
     private void sendHVM() throws IOException {
-	sendTo(this.toModelObjectStream, this.latestFromView, "model");
+	sendTo(this.toModelObjectStream, this.latestFromView, VacuumWorldClientManager.MODEL);
     }
 
     private void receiveHMV() {
@@ -203,7 +192,7 @@ public class VacuumWorldClientManager implements Runnable {
     }
 
     private void sendHMV() throws IOException {
-	sendTo(this.toViewObjectStream, this.latestFromModel, "view");
+	sendTo(this.toViewObjectStream, this.latestFromModel, VacuumWorldClientManager.VIEW);
     }
     
     private void sendTo(ObjectOutputStream to, VacuumWorldMessage message, String recipient) throws IOException {
@@ -222,16 +211,6 @@ public class VacuumWorldClientManager implements Runnable {
 	catch(Exception e) {
 	    LogUtils.log(e);
 	}
-	
-	/*
-	try {
-	    LogUtils.log("Controller here: I am idle...");
-		
-	    Thread.sleep(5000);
-	}
-	catch(InterruptedException e) {
-	    Thread.currentThread().interrupt();
-	}*/
     }
     
     private void waitForView() throws IOException {
@@ -273,19 +252,19 @@ public class VacuumWorldClientManager implements Runnable {
     }
 
     private void parseHVC() {
-	parseMessageType(VWMessageCodes.HELLO_CONTROLLER_FROM_VIEW, this.latestFromView, "view");
+	parseMessageType(VWMessageCodes.HELLO_CONTROLLER_FROM_VIEW, this.latestFromView, VacuumWorldClientManager.VIEW);
     }
 
     private void parseHMC() {
-	parseMessageType(VWMessageCodes.HELLO_CONTROLLER_FROM_MODEL, this.latestFromModel, "model");
+	parseMessageType(VWMessageCodes.HELLO_CONTROLLER_FROM_MODEL, this.latestFromModel, VacuumWorldClientManager.MODEL);
     }
     
     private void parseHVM() {
-	parseMessageType(VWMessageCodes.HELLO_MODEL_FROM_VIEW, this.latestFromView, "view");
+	parseMessageType(VWMessageCodes.HELLO_MODEL_FROM_VIEW, this.latestFromView, VacuumWorldClientManager.VIEW);
     }
 
     private void parseHMV() {
-	parseMessageType(VWMessageCodes.HELLO_VIEW_FROM_MODEL, this.latestFromModel, "model");
+	parseMessageType(VWMessageCodes.HELLO_VIEW_FROM_MODEL, this.latestFromModel, VacuumWorldClientManager.MODEL);
     }
     
     
@@ -298,5 +277,9 @@ public class VacuumWorldClientManager implements Runnable {
 	else {
 	    LogUtils.log("Controller here: received " + receivedCode + " from the " + sender);
 	}
+    }
+    
+    public Socket getModelSocket() {
+	return this.modelSocket;
     }
 }
