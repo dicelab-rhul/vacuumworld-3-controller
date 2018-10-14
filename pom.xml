@@ -20,37 +20,31 @@
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
 			<version>5.0.1</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.vintage</groupId>
 			<artifactId>junit-vintage-engine</artifactId>
 			<version>4.12.1</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>19.0</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.cloudstrife9999</groupId>
 			<artifactId>LogUtilities</artifactId>
 			<version>1.0.1-SNAPSHOT</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>uk.ac.rhul.cs.dice.vacuumworld</groupId>
 			<artifactId>vwcommon</artifactId>
 			<version>1.0.0</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>20180813</version>
-			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 	<build>
@@ -96,7 +90,7 @@
 							<archive>
 								<manifest>
 									<addClasspath>true</addClasspath>
-									<mainClass>uk.ac.rhul.cs.dice.vacuumworld.Main</mainClass>
+									<mainClass>uk.ac.rhul.cs.dice.vacuumworldcontroller.Main</mainClass>
 								</manifest>
 							</archive>
 							<descriptorRefs>
