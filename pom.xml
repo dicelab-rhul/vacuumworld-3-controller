@@ -91,7 +91,7 @@
 							<goal>single</goal>
 						</goals>
 						<configuration>
-							<finalName>vw3model</finalName>
+							<finalName>vw3controller</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
 							<archive>
 								<manifest>
