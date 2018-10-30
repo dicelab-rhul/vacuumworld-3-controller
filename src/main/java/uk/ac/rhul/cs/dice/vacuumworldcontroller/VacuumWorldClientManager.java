@@ -2,11 +2,11 @@ package uk.ac.rhul.cs.dice.vacuumworldcontroller;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import org.apache.commons.io.serialization.ValidatingObjectInputStream;
 import org.cloudstrife9999.logutilities.LogUtils;
 
 import uk.ac.rhul.cs.dice.vacuumworld.vwcommon.VWMessageCodes;
@@ -20,12 +20,12 @@ public class VacuumWorldClientManager implements Runnable {
     private InputStream fromModel;
     private InputStream errorsFromModel;
     private OutputStream toModel;
-    private ObjectInputStream fromModelObjectStream;
+    private ValidatingObjectInputStream fromModelObjectStream;
     private ObjectOutputStream toModelObjectStream;
     private Socket viewSocket;
     private InputStream fromView;
     private OutputStream toView;
-    private ObjectInputStream fromViewObjectStream;
+    private ValidatingObjectInputStream fromViewObjectStream;
     private ObjectOutputStream toViewObjectStream;
     private volatile boolean stop;
     private VacuumWorldMessage latestFromView;
@@ -37,7 +37,7 @@ public class VacuumWorldClientManager implements Runnable {
 	this.viewSocket = clientSocket;
 	this.fromView = this.viewSocket.getInputStream();
 	this.toView = this.viewSocket.getOutputStream();
-	this.fromViewObjectStream = new ObjectInputStream(this.fromView);
+	this.fromViewObjectStream = new ValidatingObjectInputStream(this.fromView);
 	this.toViewObjectStream = new ObjectOutputStream(this.toView);
 	
 	this.modelIp = modelIp;
@@ -52,7 +52,7 @@ public class VacuumWorldClientManager implements Runnable {
 	this.modelSocket = new Socket(this.modelIp, this.modelPort);
 	this.toModel = this.modelSocket.getOutputStream();
 	this.fromModel = this.modelSocket.getInputStream();
-	this.fromModelObjectStream = new ObjectInputStream(this.fromModel);
+	this.fromModelObjectStream = new ValidatingObjectInputStream(this.fromModel);
 	this.toModelObjectStream = new ObjectOutputStream(this.toModel);
 	
 	LogUtils.log("Controller here: connected to the model at " + this.modelIp + ":" + this.modelPort + ".");
@@ -82,7 +82,7 @@ public class VacuumWorldClientManager implements Runnable {
 	return this.toModel;
     }
     
-    public ObjectInputStream getFromModelObjectStream() {
+    public ValidatingObjectInputStream getFromModelObjectStream() {
 	return this.fromModelObjectStream;
     }
     
@@ -102,7 +102,7 @@ public class VacuumWorldClientManager implements Runnable {
 	return this.toView;
     }
     
-    public ObjectInputStream getFromViewObjectStream() {
+    public ValidatingObjectInputStream getFromViewObjectStream() {
 	return this.fromViewObjectStream;
     }
     
