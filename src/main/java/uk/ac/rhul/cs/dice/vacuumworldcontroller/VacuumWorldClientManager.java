@@ -9,8 +9,7 @@ import java.net.Socket;
 import org.apache.commons.io.serialization.ValidatingObjectInputStream;
 import org.cloudstrife9999.logutilities.LogUtils;
 
-import uk.ac.rhul.cs.dice.vacuumworld.vwcommon.VWAbstractMessage;
-import uk.ac.rhul.cs.dice.vacuumworld.vwcommon.VWMessage;
+import uk.ac.rhul.cs.dice.vacuumworld.vwcommon.VWHandshakeWhitelister;
 import uk.ac.rhul.cs.dice.vacuumworld.vwcommon.VWMessageCodes;
 import uk.ac.rhul.cs.dice.vacuumworld.vwcommon.VacuumWorldMessage;
 
@@ -136,7 +135,7 @@ public class VacuumWorldClientManager implements Runnable {
 
     private void receiveHVC() {
 	try {
-	    this.fromViewObjectStream.accept(VacuumWorldMessage.class, VWAbstractMessage.class, VWMessage.class, VWMessageCodes.class);
+	    VWHandshakeWhitelister.whitelistHandshakeClasses(this.fromViewObjectStream);
 	    this.latestFromView = (VacuumWorldMessage) this.fromViewObjectStream.readObject();
 	    parseHVC();
 	    
@@ -155,7 +154,7 @@ public class VacuumWorldClientManager implements Runnable {
 
     private void receiveHMC() {
 	try {
-	    this.fromModelObjectStream.accept(VacuumWorldMessage.class, VWAbstractMessage.class, VWMessage.class, VWMessageCodes.class);
+	    VWHandshakeWhitelister.whitelistHandshakeClasses(this.fromModelObjectStream);
 	    this.latestFromModel = (VacuumWorldMessage) this.fromModelObjectStream.readObject();
 	    parseHMC();
 	    sendHCV();
@@ -171,7 +170,7 @@ public class VacuumWorldClientManager implements Runnable {
 
     private void receiveHVM() {
 	try {
-	    this.fromViewObjectStream.accept(VacuumWorldMessage.class, VWAbstractMessage.class, VWMessage.class, VWMessageCodes.class);
+	    VWHandshakeWhitelister.whitelistHandshakeClasses(this.fromViewObjectStream);
 	    this.latestFromView = (VacuumWorldMessage) this.fromViewObjectStream.readObject();
 	    parseHVM();
 	    sendHVM();
@@ -187,7 +186,7 @@ public class VacuumWorldClientManager implements Runnable {
 
     private void receiveHMV() {
 	try {
-	    this.fromModelObjectStream.accept(VacuumWorldMessage.class, VWAbstractMessage.class, VWMessage.class, VWMessageCodes.class);
+	    VWHandshakeWhitelister.whitelistHandshakeClasses(this.fromModelObjectStream);
 	    this.latestFromModel = (VacuumWorldMessage) this.fromModelObjectStream.readObject();
 	    parseHMV();
 	    sendHMV();
@@ -223,7 +222,7 @@ public class VacuumWorldClientManager implements Runnable {
 	try {
 	    LogUtils.log("Controller here: waiting for view...");
 	    
-	    this.fromViewObjectStream.accept(VacuumWorldMessage.class, VWAbstractMessage.class, VWMessage.class, VWMessageCodes.class);
+	    VWHandshakeWhitelister.whitelistHandshakeClasses(this.fromViewObjectStream);
 	    VacuumWorldMessage message = (VacuumWorldMessage) this.fromViewObjectStream.readObject();
 	    
 	    this.toModelObjectStream.reset();
@@ -245,7 +244,7 @@ public class VacuumWorldClientManager implements Runnable {
 	try {
 	    LogUtils.log("Controller here: waiting for model...");
 	    
-	    this.fromModelObjectStream.accept(VacuumWorldMessage.class, VWAbstractMessage.class, VWMessage.class, VWMessageCodes.class);
+	    VWHandshakeWhitelister.whitelistHandshakeClasses(this.fromModelObjectStream);
 	    VacuumWorldMessage message = (VacuumWorldMessage) this.fromModelObjectStream.readObject();
 	    
 	    LogUtils.log(message.getContent().toString());
