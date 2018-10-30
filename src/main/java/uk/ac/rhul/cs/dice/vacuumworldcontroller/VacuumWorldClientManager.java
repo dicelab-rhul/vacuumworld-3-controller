@@ -134,6 +134,7 @@ public class VacuumWorldClientManager implements Runnable {
 
     private void receiveHVC() {
 	try {
+	    this.fromViewObjectStream.accept(VacuumWorldMessage.class);
 	    this.latestFromView = (VacuumWorldMessage) this.fromViewObjectStream.readObject();
 	    parseHVC();
 	    
@@ -152,6 +153,7 @@ public class VacuumWorldClientManager implements Runnable {
 
     private void receiveHMC() {
 	try {
+	    this.fromModelObjectStream.accept(VacuumWorldMessage.class);
 	    this.latestFromModel = (VacuumWorldMessage) this.fromModelObjectStream.readObject();
 	    parseHMC();
 	    sendHCV();
@@ -167,6 +169,7 @@ public class VacuumWorldClientManager implements Runnable {
 
     private void receiveHVM() {
 	try {
+	    this.fromViewObjectStream.accept(VacuumWorldMessage.class);
 	    this.latestFromView = (VacuumWorldMessage) this.fromViewObjectStream.readObject();
 	    parseHVM();
 	    sendHVM();
@@ -182,6 +185,7 @@ public class VacuumWorldClientManager implements Runnable {
 
     private void receiveHMV() {
 	try {
+	    this.fromModelObjectStream.accept(VacuumWorldMessage.class);
 	    this.latestFromModel = (VacuumWorldMessage) this.fromModelObjectStream.readObject();
 	    parseHMV();
 	    sendHMV();
@@ -217,6 +221,7 @@ public class VacuumWorldClientManager implements Runnable {
 	try {
 	    LogUtils.log("Controller here: waiting for view...");
 	    
+	    this.fromViewObjectStream.accept(VacuumWorldMessage.class);
 	    VacuumWorldMessage message = (VacuumWorldMessage) this.fromViewObjectStream.readObject();
 	    
 	    this.toModelObjectStream.reset();
@@ -238,6 +243,7 @@ public class VacuumWorldClientManager implements Runnable {
 	try {
 	    LogUtils.log("Controller here: waiting for model...");
 	    
+	    this.fromModelObjectStream.accept(VacuumWorldMessage.class);
 	    VacuumWorldMessage message = (VacuumWorldMessage) this.fromModelObjectStream.readObject();
 	    
 	    LogUtils.log(message.getContent().toString());
