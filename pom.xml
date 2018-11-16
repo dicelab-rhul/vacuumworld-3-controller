@@ -3,12 +3,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>uk.ac.rhul.cs.dice</groupId>
-	<artifactId>VacuumWorld-3.0-Controller</artifactId>
-	<version>1.0.1</version>
+	<groupId>uk.ac.rhul.cs.dice.vacuumworld</groupId>
+	<artifactId>vacuumworld-controller</artifactId>
+	<version>3.0.1</version>
 	<packaging>jar</packaging>
 
-	<name>VacuumWorld-3.0-Controller</name>
+	<name>vacuumworld-controller</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
