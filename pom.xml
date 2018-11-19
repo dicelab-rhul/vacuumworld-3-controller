@@ -25,13 +25,11 @@
 			<groupId>org.cloudstrife9999</groupId>
 			<artifactId>LogUtilities</artifactId>
 			<version>1.0.1</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>uk.ac.rhul.cs.dice.vacuumworld</groupId>
 			<artifactId>vwcommon</artifactId>
 			<version>1.0.1</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
