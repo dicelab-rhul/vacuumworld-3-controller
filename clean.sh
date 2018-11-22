@@ -3,9 +3,7 @@
 source common.sh
 
 if [ ! -d ${TARGET_DIR} ]; then
-    echo "${TARGET_DIR} is not a directory or does not exist. Aborting..."
-
-    exit 1
+    echo "${TARGET_DIR} is not a directory or does not exist. No need to perform any cleaning operation."
 else
     echo "Removing every file in target/ with 'rm -rf target/*' ..."
     rm -rf ${TARGET_DIR}/*
